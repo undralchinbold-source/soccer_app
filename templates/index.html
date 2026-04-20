@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+    <meta charset="UTF-8">
+    <title>Soccer Detector</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen p-10">
+    <div class="max-w-2xl mx-auto bg-white p-8 rounded-xl shadow-md">
+        <h1 class="text-2xl font-bold mb-6 text-center text-blue-600">Soccer Ball Detector</h1>
+        
+        <div class="space-y-4">
+            <div class="p-4 border-2 border-dashed border-gray-300 rounded-lg">
+                <p class="mb-2 font-semibold">Зураг оруулах:</p>
+                <input type="file" id="fileInput" class="w-full">
+                <button onclick="uploadFile()" class="mt-2 w-full bg-green-500 text-white p-2 rounded">Файлаар таних</button>
+            </div>
+
+            <div class="text-center font-bold">ЭСВЭЛ</div>
+
+            <div class="p-4 border border-gray-200 rounded-lg">
+                <p class="mb-2 font-semibold">Зургийн URL:</p>
+                <input type="text" id="urlInput" class="w-full p-2 border rounded" placeholder="https://...">
+                <button onclick="detectUrl()" class="mt-2 w-full bg-blue-500 text-white p-2 rounded">URL-аар таних</button>
+            </div>
+        </div>
+
+        <div id="result" class="mt-10 hidden">
+            <h2 id="status" class="text-xl font-bold mb-4"></h2>
+            <img id="outputImage" src="" class="w-full rounded shadow">
+        </div>
+    </div>
+
+    <script>
+        async function uploadFile() {
+            const fileInput = document.getElementById('fileInput');
+            if (fileInput.files.length === 0) return alert("Файл сонгоно уу");
+            
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+
+            const res = await fetch('/detect', { method: 'POST', body: formData });
+            showResult(await res.json());
+        }
+
+        async function detectUrl() {
+            const url = document.getElementById('urlInput').value;
+            if (!url) return alert("URL оруулна уу");
+
+            const res = await fetch('/detect', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ image_url: url })
+            });
+            showResult(await res.json());
+        }
+
+        function showResult(data) {
+            const resultDiv = document.getElementById('result');
+            const status = document.getElementById('status');
+            const img = document.getElementById('outputImage');
+
+            resultDiv.classList.remove('hidden');
+            if (data.detected) {
+                status.innerText = "✅ Бөмбөг олдлоо!";
+                status.className = "text-xl font-bold mb-4 text-green-600";
+                img.src = data.image_url + "?t=" + new Date().getTime();
+                img.classList.remove('hidden');
+            } else {
+                status.innerText = "❌ Олдсонгүй: " + data.message;
+                status.className = "text-xl font-bold mb-4 text-red-600";
+                img.classList.add('hidden');
+            }
+        }
+    </script>
+</body>
+</html>
