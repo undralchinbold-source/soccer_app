@@ -4,6 +4,7 @@ YOLO загвар ашиглан зураг дээрх хөлбөмбөгийг 
 A Flask web application that detects a soccer ball in an image using a YOLO object-detection model.
 
 Хэрэглэгч зураг (файлаар эсвэл URL-аар) илгээхэд систем түүнийг YOLO загвараар боловсруулж, бөмбөг илэрсэн эсэхийг **бодит хугацаанд** ("Бөмбөг олдлоо!" / "Олдсонгүй") вэб хуудсан дээр харуулна.
+When a user submits an image (either as a file or a URL), the system processes it with the YOLO model and shows, **in real time**, whether a ball was found ("Ball found!" / "Not found") right on the web page.
 
 ---
 
@@ -11,44 +12,51 @@ A Flask web application that detects a soccer ball in an image using a YOLO obje
 
 ```
 soccer_app/
-├── app.py                  # Flask сервер, API route-ууд (/, /detect, /output/<file>)
-├── requirements.txt        # Python dependency жагсаалт
+├── app.py                    # Flask сервер, API route-ууд (/, /detect, /output/<file>)
+│                              # Flask server, API routes (/, /detect, /output/<file>)
+├── requirements.txt          # Python dependency жагсаалт
+│                              # Python dependency list
 ├── models/
-│   └── best.pt              # Сургагдсан YOLO жин (model weights)
+│   └── best.pt                # Сургагдсан YOLO жин (model weights)
+│                               # Trained YOLO model weights
 ├── src/
 │   ├── __init__.py
-│   └── soccer_detection.py  # Илрүүлэлтийн үндсэн логик (OpenCV + YOLO)
+│   └── soccer_detection.py    # Илрүүлэлтийн үндсэн логик (OpenCV + YOLO)
+│                               # Core detection logic (OpenCV + YOLO)
 ├── templates/
-│   └── index.html           # Веб UI (upload/URL хэлбэр, үр дүн харуулах)
-├── uploads/                  # Хэрэглэгчийн оруулсан зурагнууд хадгалагдах хавтас
+│   └── index.html              # Веб UI (upload/URL хэлбэр, үр дүн харуулах)
+│                                # Web UI (upload/URL form, result display)
+├── uploads/                    # Хэрэглэгчийн оруулсан зурагнууд хадгалагдах хавтас
+│                                # Folder where user-uploaded images are stored
 └── output/
-    └── detected.jpg          # Илрүүлэлтийн үр дүн (bounding box-той зураг)
+    └── detected.jpg             # Илрүүлэлтийн үр дүн (bounding box-той зураг)
+                                  # Detection result (image with bounding box)
 ```
 
 ---
 
 ## 🛠️ Ашигласан технологи / Tech Stack
 
-| Технологи | Зориулалт |
+| Технологи / Technology | Зориулалт / Purpose |
 |---|---|
 | **Python 3** | Гол хэл / Core language |
-| **Flask** | Веб сервер ба REST API |
-| **OpenCV** (`opencv-python`) | Зураг унших, боловсруулах, bounding box зурах |
-| **PyTorch** | YOLO загварын суурь framework |
-| **YOLO** (`ultralytics`) | Хөлбөмбөгийг илрүүлэх object detection загвар |
+| **Flask** | Веб сервер ба REST API / Web server and REST API |
+| **OpenCV** (`opencv-python`) | Зураг унших, боловсруулах, bounding box зурах / Reading, processing images and drawing bounding boxes |
+| **PyTorch** | YOLO загварын суурь framework / Underlying framework for the YOLO model |
+| **YOLO** (`ultralytics`) | Хөлбөмбөгийг илрүүлэх object detection загвар / Object detection model used to detect the soccer ball |
 
 ---
 
 ## ✨ Гол онцлогууд / Key Features
 
-- ⚽ **Бодит хугацааны илрүүлэлт** — зураг илгээмэгц YOLO загвар ажиллаж, "✅ Бөмбөг олдлоо!" эсвэл "❌ Олдсонгүй" гэсэн үр дүнг шууд вэб дээр харуулна.
-  Real-time detection — as soon as an image is submitted, the YOLO model runs and the page instantly shows **"Ball found!"** or **"Not found"**.
-- 🖼️ **Зураг боловсруулалт** — илэрсэн бөмбөгийг ногоон дөрвөлжин (bounding box) болон итгэлцлийн хувиар (confidence score) тэмдэглэж, `output/detected.jpg` файлд хадгална.
-  Image processing — detected balls are marked with a bounding box and confidence score, saved to `output/detected.jpg`.
-- 📤 **Файл эсвэл URL-аар оруулах** — компьютероос зураг сонгох, эсвэл интернэт дэх зургийн URL холбоос өгөх боломжтой.
-  Supports both file upload and image URL as input.
-- 🌐 **Энгийн, хариу үйлдэлтэй веб интерфейс** — Tailwind CSS ашигласан, drag-and-drop маягийн upload UI.
-  Simple, responsive web UI built with Tailwind CSS.
+- ⚽ **Бодит хугацааны илрүүлэлт / Real-time detection** — зураг илгээмэгц YOLO загвар ажиллаж, "✅ Бөмбөг олдлоо!" эсвэл "❌ Олдсонгүй" гэсэн үр дүнг шууд вэб дээр харуулна.
+  As soon as an image is submitted, the YOLO model runs and the page instantly shows **"✅ Ball found!"** or **"❌ Not found"**.
+- 🖼️ **Зураг боловсруулалт / Image processing** — илэрсэн бөмбөгийг ногоон дөрвөлжин (bounding box) болон итгэлцлийн хувиар (confidence score) тэмдэглэж, `output/detected.jpg` файлд хадгална.
+  Detected balls are marked with a green bounding box and a confidence score, then saved to `output/detected.jpg`.
+- 📤 **Файл эсвэл URL-аар оруулах / Upload by file or URL** — компьютероос зураг сонгох, эсвэл интернэт дэх зургийн URL холбоос өгөх боломжтой.
+  Supports both uploading an image from your computer and providing an image URL from the internet.
+- 🌐 **Энгийн, хариу үйлдэлтэй веб интерфейс / Simple, responsive web UI** — Tailwind CSS ашигласан, drag-and-drop маягийн upload UI.
+  Built with Tailwind CSS, featuring a clean, drag-and-drop-style upload interface.
 
 ---
 
@@ -84,13 +92,16 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
+Энэ команд нь Flask, OpenCV, PyTorch, Ultralytics (YOLO) зэрэг бүх шаардлагатай Python сангуудыг `requirements.txt`-д заасны дагуу суулгана.
+This command installs all required Python packages — Flask, OpenCV, PyTorch, Ultralytics (YOLO), etc. — as pinned in `requirements.txt`.
+
 ### 4. Аппликейшныг ажиллуулах / Run the application
 
 ```bash
 python app.py
 ```
 
-Сервер амжилттай асвал доорх хаягаар нэвтэрнэ / Once running, open your browser at:
+Сервер амжилттай асвал доорх хаягаар нэвтэрнэ / Once the server is running, open your browser at:
 
 ```
 http://127.0.0.1:8000
@@ -111,3 +122,5 @@ http://127.0.0.1:8000
   The YOLO model weights (`models/best.pt`) must already be trained/present before running.
 - `uploads/` болон `output/` хавтаснууд ажиллах явцад автоматаар ашиглагдана.
   The `uploads/` and `output/` folders are used automatically at runtime for input and result images.
+- Виртуал орчин (`venv/`) болон Python bytecode кэш (`__pycache__/`) хавтаснууд `.gitignore`-д орсон тул хувилбар удирдлагад ороогүй.
+  The virtual environment (`venv/`) and Python bytecode cache (`__pycache__/`) folders are listed in `.gitignore` and are excluded from version control.
